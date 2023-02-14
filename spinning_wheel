@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spinning Wheel Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 50px;
+        }
+        #wheel {
+            width: 300px;
+            height: 300px;
+            margin: 50px auto;
+            position: relative;
+        }
+        #wheel canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #spin-button {
+            padding: 10px 20px;
+            background-color: #337ab7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spinning Wheel Game</h1>
+    <div id="wheel">
+        <canvas id="canvas" width="300" height="300"></canvas>
+    </div>
+    <button id="spin-button">Spin!</button>
+    <script>
+        // Initialize the wheel
+        var people = [];
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+        var slices = 10;
+        var sliceWidth = (Math.PI * 2) / slices;
+        for (var i = 0; i < slices; i++) {
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 150, i * sliceWidth, (i + 1) * sliceWidth);
+            ctx.lineTo(150, 150);
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+            ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.arc(150, 150, 100, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (var i = 0; i < slices; i++) {
+            var angle = i * sliceWidth + (sliceWidth / 2);
+            ctx.save();
+            ctx.translate(150, 150);
+            ctx.rotate(angle);
+            var text = (i + 1).toString();
+            ctx.fillText(text, 80, 0);
+            ctx.restore();
+        }
+
+        // Handle the spin button click
+        var button = document.getElementById('spin-button');
+        button.addEventListener('click', function() {
+            if (people.length < 2) {
+                alert('Please enter at least 2 names to play the game!');
+                return;
+            }
+            var result = spinWheel();
+            var message = 'Spinning... ' + result + ' is eliminated!';
+            alert(message);
+            people = people.filter(function(person) {
+                return person !== result;
+            });
+            if (people.length === 1) {
+                var winner = people[0];
+                message = 'The winner is ' + winner +
